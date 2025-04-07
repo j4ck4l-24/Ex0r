@@ -13,7 +13,7 @@ func ApiRoutes(app *fiber.App) {
 
     auth_api := api.Group("/auth")
     auth_api.Post("/login", auth.LoginAttempt)
-    auth_api.Post("/register",healthcheck)
+    auth_api.Post("/register",auth.RegisterAttempt)
     auth_api.Post("/logout",healthcheck)
 
     // I don't think so there is need of admin api as of now as we can implement token based role system

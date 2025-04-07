@@ -1,10 +1,12 @@
 package db
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 
 	"github.com/j4ck4l-24/Ex0r/pkg/config"
+	_ "github.com/lib/pq"
 )
 
 var (
@@ -15,10 +17,12 @@ var (
 	dbname   string
 )
 
-func InitDB() {
+var DB *sql.DB
+
+func InitDB() (*sql.DB, error) {
 	postgresConfig, _, err := config.Load()
 	if err != nil {
-		log.Fatalf("Failed to load database config: %v", err)
+		fmt.Printf("Failed to load database config: %v", err)
 	}
 
 	host = postgresConfig.Host
@@ -27,6 +31,17 @@ func InitDB() {
 	password = postgresConfig.Password
 	dbname = postgresConfig.DBname
 
-	connString := fmt.Sprintf("%s %s %s %s %s", host, port, user, password, dbname)
-	fmt.Println(connString)
+	connString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+
+	db, err := sql.Open("postgres", connString)
+	if err != nil {
+		fmt.Printf("Error connecting the db:%v", err)
+	}
+	err = db.Ping()
+	if err != nil {
+		fmt.Print("Error pinging the db")
+	}
+	log.Print("Connected Succesfully")
+	DB = db
+	return db, nil
 }

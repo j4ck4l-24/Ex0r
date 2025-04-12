@@ -44,6 +44,9 @@ func CreateToken(id int, username string, email string, role string) (token stri
 }
 
 func VerifyToken(token string) (claims jwt.MapClaims, err error) {
+	if token == "" {
+		return nil, fmt.Errorf("empty token")
+	}
 	t, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("invalid signing method: %v", token.Method)
@@ -51,7 +54,6 @@ func VerifyToken(token string) (claims jwt.MapClaims, err error) {
 		return SECRET_KEY, nil
 	})
 
-	fmt.Printf("%v \n %v \n",t.Method ,t.Valid)
 	if err != nil {
 		return nil, err
 	}
@@ -61,4 +63,18 @@ func VerifyToken(token string) (claims jwt.MapClaims, err error) {
 	}
 
 	return nil, fmt.Errorf("invalid token")
+}
+
+func IsAdmin(token string) (isAdmin bool) {
+	t, _ := VerifyToken(token)
+	if t == nil {
+		return false
+	}
+	return t["role"] == "admin"
+}
+
+func ValidToken(token string) (validToken bool) {
+	t, _ := VerifyToken(token)
+
+	return t != nil
 }

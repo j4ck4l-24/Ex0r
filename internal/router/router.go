@@ -3,7 +3,9 @@ package router
 import (
 	// "fmt"
 	"github.com/gofiber/fiber/v2"
-    "github.com/j4ck4l-24/Ex0r/internal/handlers/auth"
+	"github.com/j4ck4l-24/Ex0r/internal/handlers/auth"
+	"github.com/j4ck4l-24/Ex0r/internal/handlers/challenges"
+	"github.com/j4ck4l-24/Ex0r/internal/middleware"
 )
 
 
@@ -20,6 +22,7 @@ func ApiRoutes(app *fiber.App) {
     // admin := api.Group("/admin")
     // admin.Get("/",healthcheck)
 
+    api.Get("/challenge", middleware.Protected(), challenges.GetAllChallenges)
 }
 
 

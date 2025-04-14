@@ -3,10 +3,12 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/j4ck4l-24/Ex0r/pkg/config"
 	_ "github.com/lib/pq"
 )
+var DB *sql.DB
 
 var (
 	host     string
@@ -16,7 +18,7 @@ var (
 	dbname   string
 )
 
-func InitDB() (*sql.DB, error) {
+func InitDB() error {
 	postgresConfig, _, err := config.Load()
 	if err != nil {
 		fmt.Printf("Failed to load database config: %v", err)
@@ -33,11 +35,18 @@ func InitDB() (*sql.DB, error) {
 	db, err := sql.Open("postgres", connString)
 	if err != nil {
 		fmt.Printf("Error connecting the db:%v", err)
+		return err
 	}
+
+	db.SetMaxOpenConns(100)
+	db.SetMaxIdleConns(50)                 
+	db.SetConnMaxLifetime(10 * time.Minute) 
+
 	err = db.Ping()
 	if err != nil {
 		fmt.Print("Error pinging the db")
+		return err
 	}
-
-	return db, nil
+	DB = db
+	return nil
 }

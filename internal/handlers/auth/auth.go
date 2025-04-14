@@ -11,95 +11,57 @@ import (
 
 func LoginAttempt(c *fiber.Ctx) error {
 
-	user := new(models.LoginBody)
-	var userId int
-	var storedHashPassword string
-	var userEmail string
-	var userRole string
-	var dbUserName string
-	if err := c.BodyParser(user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(models.GeneralResponse{
-			Status:  fiber.StatusBadRequest,
-			Message: "Invalid Body Request",
-		})
+	reqBody := new(models.LoginBody)
+	var user models.User
+	if err := c.BodyParser(reqBody); err != nil {
+		return utils.SendGeneralResponse(c, fiber.StatusBadRequest, "Invalid request body")
 	}
 
-	if (user.Username == "") || user.Password == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(models.GeneralResponse{
-			Status:  fiber.StatusBadRequest,
-			Message: "Missing username or password",
-		})
+	if (reqBody.Username == "") || reqBody.Password == "" {
+		return utils.SendGeneralResponse(c, fiber.StatusBadRequest, "Missing username or password")
 	}
-	var dbConn, err = db.InitDB()
-
+	dbConn := db.DB
+	
 	query := "SELECT id, username, email, role, password_hash FROM Users WHERE username = $1"
-	err = dbConn.QueryRow(query, user.Username).Scan(&userId, &dbUserName, &userEmail, &userRole, &storedHashPassword)
+	err := dbConn.QueryRow(query, reqBody.Username).Scan(&user.UserId, &user.DbUserName, &user.UserEmail, &user.UserRole, &user.StoredHashPassword)
 
+	if err != nil || !utils.VerifyPassword(reqBody.Password, user.StoredHashPassword) {
+		return utils.SendGeneralResponse(c, fiber.StatusUnauthorized, "Incorrect credentials")
+	}
+
+	token, err := utils.CreateToken(user.UserId, user.DbUserName, user.UserEmail, user.UserRole)
+	
 	if err != nil {
-		return c.Status(fiber.StatusConflict).JSON(models.GeneralResponse{
-			Status:  fiber.StatusUnauthorized,
-			Message: "Incorrect credentials",
-		})
+		return utils.SendGeneralResponse(c, fiber.StatusBadRequest, "Something Went Wrong")
 	}
-	if !utils.VerifyPassword(user.Password, storedHashPassword) {
-		return c.Status(fiber.StatusUnauthorized).JSON(models.GeneralResponse{
-			Status:  fiber.StatusUnauthorized,
-			Message: "Incorrect credentials",
-		})
-	}
-	token, err := utils.CreateToken(userId, dbUserName, userEmail, userRole)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(models.GeneralResponse{
-			Status:  fiber.StatusBadRequest,
-			Message: "Something Went Wrong",
-		})
-	}
-	return c.Status(fiber.StatusOK).JSON(models.SuccessfulLoginResponse{
-		Status:  fiber.StatusOK,
-		Message: "Login Successful",
-		Token:   token,
-	})
+	return utils.SendSuccessfulLoginResponse(c, token)
 }
 
 func RegisterAttempt(c *fiber.Ctx) error {
 
-	user := new(models.RegisterBody)
+	reqBody := new(models.RegisterBody)
 
-	if err := c.BodyParser(user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(models.GeneralResponse{
-			Status:  fiber.StatusBadRequest,
-			Message: "Invalid Body Request",
-		})
+	if err := c.BodyParser(reqBody); err != nil {
+		return utils.SendGeneralResponse(c, fiber.StatusBadRequest, "Invalid request body")
 	}
 
-	if (user.Username == "") || user.Email == "" || user.Password == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(models.GeneralResponse{
-			Status:  fiber.StatusBadRequest,
-			Message: "Missing username or password",
-		})
+	if (reqBody.Username == "") || reqBody.Email == "" || reqBody.Password == "" {
+		return utils.SendGeneralResponse(c, fiber.StatusBadRequest, "Missing username or password")
 	}
 
-	if !utils.IsValidEmail(user.Email) {
-		return c.Status(fiber.StatusBadRequest).JSON(models.GeneralResponse{
-			Status:  fiber.StatusBadRequest,
-			Message: "Invalid email",
-		})
+	if !utils.IsValidEmail(reqBody.Email) {
+		return utils.SendGeneralResponse(c, fiber.StatusBadRequest, "Invalid Email")
 	}
-	var dbConn, err = db.InitDB()
-	user.Password, _ = utils.HashPassword(user.Password)
+	dbConn := db.DB
+	reqBody.Password, _ = utils.HashPassword(reqBody.Password)
 	var userId int
 	query := "INSERT INTO USERS (username, password_hash, email) VALUES ($1, $2, $3) RETURNING id"
 
-	err = dbConn.QueryRow(query, user.Username, user.Password, strings.ToLower(user.Email)).Scan(&userId)
+	err := dbConn.QueryRow(query, reqBody.Username, reqBody.Password, strings.ToLower(reqBody.Email)).Scan(&userId)
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(models.GeneralResponse{
-			Status:  fiber.StatusUnauthorized,
-			Message: "User already exists",
-		})
+		return utils.SendGeneralResponse(c, fiber.StatusConflict, "User Already Exists")
 	}
 
-	return c.Status(fiber.StatusOK).JSON(models.GeneralResponse{
-		Status:  fiber.StatusOK,
-		Message: "Registration Successful",
-	})
+	return utils.SendGeneralResponse(c, fiber.StatusOK, "Registration Successful")
+
 }

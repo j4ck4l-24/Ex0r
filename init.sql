@@ -29,6 +29,9 @@ CREATE Table Teams (
     members_id int[],
 );
 
+ALTER TABLE Teams 
+ADD FOREIGN KEY (captain_id) REFERENCES Users(id) ON DELETE SET NULL;
+
 CREATE TABLE Challenges (
     id SERIAL PRIMARY KEY,
     chall_name VARCHAR(255) NOT NULL,

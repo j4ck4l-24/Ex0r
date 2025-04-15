@@ -9,7 +9,7 @@ func Protected() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		token := c.Cookies("token")
 		if token == "" || !utils.ValidToken(token) {
-			return utils.SendGeneralResponse(c, fiber.StatusUnauthorized, "Unauthorized Access")
+			return utils.SendGeneralResp(c, fiber.StatusUnauthorized, "Unauthorized Access")
 		}
 		claims, _ := utils.VerifyToken(token)
 		c.Locals("user_data", claims)
@@ -21,7 +21,7 @@ func AdminOnly() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		token := c.Cookies("token")
 		if !utils.IsAdmin(token) {
-			return utils.SendGeneralResponse(c, fiber.StatusForbidden, "Forbidden: Admin access required")
+			return utils.SendGeneralResp(c, fiber.StatusForbidden, "Forbidden: Admin access required")
 		}
 		return c.Next()
 	}

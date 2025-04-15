@@ -5,49 +5,49 @@ import (
 	"github.com/j4ck4l-24/Ex0r/pkg/models"
 )
 
-func SendGeneralResponse(c *fiber.Ctx, statusCode int, message string) error {
+func SendGeneralResp(c *fiber.Ctx, statusCode int, message string) error {
 	return c.Status(statusCode).JSON(models.GeneralResponse{
 		Status:  statusCode,
 		Message: message,
 	})
 }
 
-func SendPublicChallengeResponse(c *fiber.Ctx, statusCode int, message string, challenge models.ChallengePublic) error {
-	response := models.PublicChallengeResponse{
+func SendSinglePublicChallResp(c *fiber.Ctx, statusCode int, message string, challenge models.PublicChallenge) error {
+	response := models.SinglePublicChallResp{
 		Status:    statusCode,
 		Message:   message,
-		Challenge: challenge,
+		Data: challenge,
 	}
 	return c.Status(statusCode).JSON(response)
 }
-func SendAdminChallengeResponse(c *fiber.Ctx, statusCode int, message string, challenge models.ChallengeAdmin) error {
-	response := models.AdminChallengeResponse{
+func SendSingleAdminChallResp(c *fiber.Ctx, statusCode int, message string, challenge models.AdminChallenge) error {
+	response := models.SingleAdminChallResp{
 		Status:    statusCode,
 		Message:   message,
-		Challenge: challenge,
+		Data: challenge,
 	}
 	return c.Status(statusCode).JSON(response)
 }
 
-func SendPublicChallengesResponse(c *fiber.Ctx, statusCode int, message string, challenges []models.ChallengePublic) error {
-	response := models.PublicChallengesResponse{
+func SendMultiplePublicChallsResp(c *fiber.Ctx, statusCode int, message string, challenges []models.PublicChallenge) error {
+	response := models.PublicChallengesResp{
 		Status:     statusCode,
 		Message:    message,
-		Challenges: challenges,
+		Data: challenges,
 	}
 	return c.Status(statusCode).JSON(response)
 }
 
-func SendAdminChallengesResponse(c *fiber.Ctx, statusCode int, message string, challenges []models.ChallengeAdmin) error {
-	response := models.AdminChallengesResponse{
+func SendMultipleAdminChallsResp(c *fiber.Ctx, statusCode int, message string, challenges []models.AdminChallenge) error {
+	response := models.AdminChallengesResp{
 		Status:     statusCode,
 		Message:    message,
-		Challenges: challenges,
+		Data: challenges,
 	}
 	return c.Status(statusCode).JSON(response)
 }
 
-func SendSuccessfulLoginResponse(c *fiber.Ctx, token string) error {
+func SendLoginSuccessResp(c *fiber.Ctx, token string) error {
 	response := models.SuccessfulLoginResponse{
 		Status:  fiber.StatusOK,
 		Message: "Login Successful",
@@ -55,4 +55,22 @@ func SendSuccessfulLoginResponse(c *fiber.Ctx, token string) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)
+}
+
+func SendSingleFlagResp(c *fiber.Ctx, statusCode int, message string, flag models.Flag) error {
+	response := models.SingleFlagResp{
+		Status:  statusCode,
+		Message: message,
+		Data:    flag,
+	}
+	return c.Status(statusCode).JSON(response)
+}
+
+func SendMultipleFlagResp(c *fiber.Ctx, statusCode int, message string, flags []models.Flag) error {
+	response := models.MultipleFlagResp{
+		Status:  statusCode,
+		Message: message,
+		Data:    flags,
+	}
+	return c.Status(statusCode).JSON(response)
 }

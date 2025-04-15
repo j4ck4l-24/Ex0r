@@ -9,7 +9,7 @@ import (
 	"github.com/j4ck4l-24/Ex0r/pkg/models"
 )
 
-func FetchPublicChallenges(c *fiber.Ctx, db *sql.DB) ([]models.ChallengePublic, error) {
+func FetchPublicChallenges(c *fiber.Ctx, db *sql.DB) ([]models.PublicChallenge, error) {
 	query := "SELECT id, chall_name, chall_desc, category, current_points, max_attempts, type, author_name, connection_string, created_at, updated_at FROM Challenges WHERE hidden=FALSE"
 
 	m := c.Queries()
@@ -43,9 +43,9 @@ func FetchPublicChallenges(c *fiber.Ctx, db *sql.DB) ([]models.ChallengePublic, 
 		return nil, err
 	}
 	defer rows.Close()
-	var challenges []models.ChallengePublic
+	var challenges []models.PublicChallenge
 	for rows.Next() {
-		var challenge models.ChallengePublic
+		var challenge models.PublicChallenge
 		err = rows.Scan(&challenge.ChallId, &challenge.ChallName, &challenge.ChallDesc, &challenge.Category, &challenge.Points, &challenge.MaxAttempts, &challenge.Type, &challenge.AuthorName, &challenge.ConnectionString, &challenge.CreatedAt, &challenge.UpdatedAt)
 		if err != nil {
 			return nil, err
@@ -55,7 +55,7 @@ func FetchPublicChallenges(c *fiber.Ctx, db *sql.DB) ([]models.ChallengePublic, 
 	return challenges, err
 }
 
-func FetchAdminChallenges(c *fiber.Ctx, db *sql.DB) ([]models.ChallengeAdmin, error) {
+func FetchAdminChallenges(c *fiber.Ctx, db *sql.DB) ([]models.AdminChallenge, error) {
 	query := "SELECT id, chall_name, chall_desc, category, current_points, initial_points, min_points, max_attempts, type, hidden, author_name, COALESCE(decay_type, ''), COALESCE(decay_value, 0), connection_string, created_at, updated_at /*,requirements, next_chall_id*/ FROM Challenges "
 
 	m := c.Queries()
@@ -89,9 +89,9 @@ func FetchAdminChallenges(c *fiber.Ctx, db *sql.DB) ([]models.ChallengeAdmin, er
 		return nil, err
 	}
 	defer rows.Close()
-	var challenges []models.ChallengeAdmin
+	var challenges []models.AdminChallenge
 	for rows.Next() {
-		var challenge models.ChallengeAdmin
+		var challenge models.AdminChallenge
 		err = rows.Scan(&challenge.ChallId, &challenge.ChallName, &challenge.ChallDesc, &challenge.Category, &challenge.Points, &challenge.MaxPoints, &challenge.MinPoints, &challenge.MaxAttempts, &challenge.Type, &challenge.Hidden, &challenge.AuthorName, &challenge.DecayType, &challenge.DecayValue, &challenge.ConnectionString, &challenge.CreatedAt, &challenge.UpdatedAt)
 		if err != nil {
 			return nil, err
@@ -101,56 +101,56 @@ func FetchAdminChallenges(c *fiber.Ctx, db *sql.DB) ([]models.ChallengeAdmin, er
 	return challenges, err
 }
 
-func FetchPublicChallenge(c *fiber.Ctx, db *sql.DB) (models.ChallengePublic, error) {
+func FetchPublicChallenge(c *fiber.Ctx, db *sql.DB) (models.PublicChallenge, error) {
 	chall_id, err := c.ParamsInt("id")
 	if err != nil {
-		return models.ChallengePublic{}, err
+		return models.PublicChallenge{}, err
 	}
 	query := "SELECT id, chall_name, chall_desc, category, current_points, max_attempts, type, author_name, connection_string, created_at, updated_at FROM Challenges WHERE hidden=FALSE AND id = $1"
 
 	rows, err := db.Query(query, chall_id)
 	if err != nil {
-		return models.ChallengePublic{}, err
+		return models.PublicChallenge{}, err
 	}
 	defer rows.Close()
-	var challenge models.ChallengePublic
+	var challenge models.PublicChallenge
 	rows.Next()
 	err = rows.Scan(&challenge.ChallId, &challenge.ChallName, &challenge.ChallDesc, &challenge.Category, &challenge.Points, &challenge.MaxAttempts, &challenge.Type, &challenge.AuthorName, &challenge.ConnectionString, &challenge.CreatedAt, &challenge.UpdatedAt)
 	if err != nil {
-		return models.ChallengePublic{}, err
+		return models.PublicChallenge{}, err
 	}
 	return challenge, err
 }
 
-func FetchAdminChallenge(c *fiber.Ctx, db *sql.DB) (models.ChallengeAdmin, error) {
+func FetchAdminChallenge(c *fiber.Ctx, db *sql.DB) (models.AdminChallenge, error) {
 	chall_id, err := c.ParamsInt("id")
 	if err != nil {
-		return models.ChallengeAdmin{}, err
+		return models.AdminChallenge{}, err
 	}
 	query := "SELECT id, chall_name, chall_desc, category, current_points, initial_points, min_points, max_attempts, type, hidden, author_name, COALESCE(decay_type, ''), COALESCE(decay_value, 0), connection_string, created_at, updated_at /*,requirements, next_chall_id*/ FROM Challenges WHERE id = $1"
 
 	rows, err := db.Query(query, chall_id)
 	if err != nil {
-		return models.ChallengeAdmin{}, err
+		return models.AdminChallenge{}, err
 	}
 	defer rows.Close()
-	var challenge models.ChallengeAdmin
+	var challenge models.AdminChallenge
 	rows.Next()
 	err = rows.Scan(&challenge.ChallId, &challenge.ChallName, &challenge.ChallDesc, &challenge.Category, &challenge.Points, &challenge.MaxPoints, &challenge.MinPoints, &challenge.MaxAttempts, &challenge.Type, &challenge.Hidden, &challenge.AuthorName, &challenge.DecayType, &challenge.DecayValue, &challenge.ConnectionString, &challenge.CreatedAt, &challenge.UpdatedAt)
 	if err != nil {
-		return models.ChallengeAdmin{}, err
+		return models.AdminChallenge{}, err
 	}
 	return challenge, err
 }
 
-func UpdateStaticChallenge(dbConn *sql.DB, challenge *models.ChallengeAdmin) (*models.ChallengeAdmin, error) {
+func UpdateStaticChallenge(dbConn *sql.DB, challenge *models.AdminChallenge) (*models.AdminChallenge, error) {
 	query := "UPDATE Challenges SET chall_name = $1, chall_desc = $2, category = $3, current_points = $4, initial_points = $5, min_points = $6, max_attempts = $7, type = $8, hidden = $9, author_name = $10, connection_string = $11, updated_at = CURRENT_TIMESTAMP WHERE id = $12 RETURNING id;"
 	err := dbConn.QueryRow(query, challenge.ChallName, challenge.ChallDesc, challenge.Category, challenge.Points, challenge.MaxPoints, challenge.MinPoints, challenge.MaxAttempts, challenge.Type, challenge.Hidden, challenge.AuthorName, challenge.ConnectionString, challenge.ChallId).Scan(&challenge.ChallId)
 
 	return challenge, err
 }
 
-func UpdateDynamicChallenge(dbConn *sql.DB, challenge *models.ChallengeAdmin) (*models.ChallengeAdmin, error) {
+func UpdateDynamicChallenge(dbConn *sql.DB, challenge *models.AdminChallenge) (*models.AdminChallenge, error) {
 	query := "UPDATE Challenges SET chall_name = $1, chall_desc = $2, category = $3, current_points = $4, initial_points = $5, min_points = $6, max_attempts = $7, type = $8, hidden = $9, author_name = $10, decay_type = $11, decay_value = $12, connection_string = $13, updated_at = CURRENT_TIMESTAMP WHERE id = $14 RETURNING id"
 	err := dbConn.QueryRow(query, challenge.ChallName, challenge.ChallDesc, challenge.Category, challenge.Points, challenge.MaxPoints, challenge.MinPoints, challenge.MaxAttempts, challenge.Type, challenge.Hidden, challenge.AuthorName, challenge.DecayType, challenge.DecayValue, challenge.ConnectionString, challenge.ChallId).Scan(&challenge.ChallId)
 

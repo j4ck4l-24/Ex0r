@@ -53,3 +53,15 @@ CREATE TABLE Challenges (
     next_chall_id INT,
     FOREIGN KEY (next_chall_id) REFERENCES Challenges(id) ON DELETE SET NULL
 );
+
+
+CREATE TABLE Flags (
+    id SERIAL PRIMARY KEY,
+    content varchar(255) NOT NULL,
+    type varchar(255) DEFAULT 'case-sensitive',
+    chall_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (chall_id) REFERENCES Challenges(id) ON DELETE CASCADE,
+    UNIQUE (content, chall_id)
+);

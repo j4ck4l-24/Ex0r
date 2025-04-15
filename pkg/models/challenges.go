@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type ChallengePublic struct {
+type PublicChallenge struct {
 	ChallId          int       `json:"chall_id"`
 	ChallName        string    `json:"chall_name"`
 	ChallDesc        string    `json:"chall_desc"`
@@ -19,7 +19,7 @@ type ChallengePublic struct {
 	ConnectionString string    `json:"connection_string"`
 }
 
-type ChallengeAdmin struct {
+type AdminChallenge struct {
 	ChallId          int       `json:"chall_id"`
 	ChallName        string    `json:"chall_name"`
 	ChallDesc        string    `json:"chall_desc"`
@@ -39,26 +39,26 @@ type ChallengeAdmin struct {
 	MinPoints        int       `json:"min_points"`
 }
 
-type PublicChallengesResponse struct {
-	Status     int               `json:"status"`
-	Message    string            `json:"message"`
-	Challenges []ChallengePublic `json:"challenges"`
+type PublicChallengesResp struct {
+	Status  int               `json:"status"`
+	Message string            `json:"message"`
+	Data    []PublicChallenge `json:"data"`
 }
 
-type AdminChallengesResponse struct {
-	Status     int              `json:"status"`
-	Message    string           `json:"message"`
-	Challenges []ChallengeAdmin `json:"challenges"`
+type AdminChallengesResp struct {
+	Status  int              `json:"status"`
+	Message string           `json:"message"`
+	Data    []AdminChallenge `json:"data"`
 }
 
-type PublicChallengeResponse struct {
-	Status    int             `json:"status"`
-	Message   string          `json:"message"`
-	Challenge ChallengePublic `json:"challenge"`
+type SinglePublicChallResp struct {
+	Status  int             `json:"status"`
+	Message string          `json:"message"`
+	Data    PublicChallenge `json:"data"`
 }
 
-type AdminChallengeResponse struct {
-	Status    int             `json:"status"`
-	Message   string          `json:"message"`
-	Challenge ChallengeAdmin `json:"challenge"`
+type SingleAdminChallResp struct {
+	Status  int            `json:"status"`
+	Message string         `json:"message"`
+	Data    AdminChallenge `json:"data"`
 }

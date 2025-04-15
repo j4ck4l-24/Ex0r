@@ -14,27 +14,27 @@ func LoginAttempt(c *fiber.Ctx) error {
 	reqBody := new(models.LoginBody)
 	var user models.User
 	if err := c.BodyParser(reqBody); err != nil {
-		return utils.SendGeneralResponse(c, fiber.StatusBadRequest, "Invalid request body")
+		return utils.SendGeneralResp(c, fiber.StatusBadRequest, "Invalid request body")
 	}
 
 	if (reqBody.Username == "") || reqBody.Password == "" {
-		return utils.SendGeneralResponse(c, fiber.StatusBadRequest, "Missing username or password")
+		return utils.SendGeneralResp(c, fiber.StatusBadRequest, "Missing username or password")
 	}
 	dbConn := db.DB
-	
+
 	query := "SELECT id, username, email, role, password_hash FROM Users WHERE username = $1"
 	err := dbConn.QueryRow(query, reqBody.Username).Scan(&user.UserId, &user.DbUserName, &user.UserEmail, &user.UserRole, &user.StoredHashPassword)
 
 	if err != nil || !utils.VerifyPassword(reqBody.Password, user.StoredHashPassword) {
-		return utils.SendGeneralResponse(c, fiber.StatusUnauthorized, "Incorrect credentials")
+		return utils.SendGeneralResp(c, fiber.StatusUnauthorized, "Incorrect credentials")
 	}
 
 	token, err := utils.CreateToken(user.UserId, user.DbUserName, user.UserEmail, user.UserRole)
-	
+
 	if err != nil {
-		return utils.SendGeneralResponse(c, fiber.StatusBadRequest, "Something Went Wrong")
+		return utils.SendGeneralResp(c, fiber.StatusBadRequest, "Something Went Wrong")
 	}
-	return utils.SendSuccessfulLoginResponse(c, token)
+	return utils.SendLoginSuccessResp(c, token)
 }
 
 func RegisterAttempt(c *fiber.Ctx) error {
@@ -42,15 +42,15 @@ func RegisterAttempt(c *fiber.Ctx) error {
 	reqBody := new(models.RegisterBody)
 
 	if err := c.BodyParser(reqBody); err != nil {
-		return utils.SendGeneralResponse(c, fiber.StatusBadRequest, "Invalid request body")
+		return utils.SendGeneralResp(c, fiber.StatusBadRequest, "Invalid request body")
 	}
 
 	if (reqBody.Username == "") || reqBody.Email == "" || reqBody.Password == "" {
-		return utils.SendGeneralResponse(c, fiber.StatusBadRequest, "Missing username or password")
+		return utils.SendGeneralResp(c, fiber.StatusBadRequest, "Missing username or password")
 	}
 
 	if !utils.IsValidEmail(reqBody.Email) {
-		return utils.SendGeneralResponse(c, fiber.StatusBadRequest, "Invalid Email")
+		return utils.SendGeneralResp(c, fiber.StatusBadRequest, "Invalid Email")
 	}
 	dbConn := db.DB
 	reqBody.Password, _ = utils.HashPassword(reqBody.Password)
@@ -59,9 +59,9 @@ func RegisterAttempt(c *fiber.Ctx) error {
 
 	err := dbConn.QueryRow(query, reqBody.Username, reqBody.Password, strings.ToLower(reqBody.Email)).Scan(&userId)
 	if err != nil {
-		return utils.SendGeneralResponse(c, fiber.StatusConflict, "User Already Exists")
+		return utils.SendGeneralResp(c, fiber.StatusConflict, "User Already Exists")
 	}
 
-	return utils.SendGeneralResponse(c, fiber.StatusOK, "Registration Successful")
+	return utils.SendGeneralResp(c, fiber.StatusOK, "Registration Successful")
 
 }

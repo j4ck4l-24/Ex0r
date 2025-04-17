@@ -1,3 +1,16 @@
+CREATE Table Teams (
+    id SERIAL PRIMARY KEY,
+    team_name varchar(255) UNIQUE NOT NULL,
+    team_password_hash varchar(255) NOT NULL,
+    captain_id int UNIQUE,
+    hidden boolean DEFAULT FALSE,
+    banned boolean DEFAULT FALSE,
+    country varchar(10),
+    created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    members_id int[]
+);
+
 CREATE TABLE Users (
     id SERIAL PRIMARY KEY,
     username varchar(255) UNIQUE NOT NULL,
@@ -16,18 +29,6 @@ CREATE TABLE Users (
     FOREIGN KEY (team_id) REFERENCES Teams(id) ON DELETE SET NULL
 );
 
-CREATE Table Teams (
-    id SERIAL PRIMARY KEY,
-    team_name varchar(255) UNIQUE NOT NULL,
-    team_password_hash varchar(255) NOT NULL,
-    captain_id int UNIQUE,
-    hidden boolean DEFAULT FALSE,
-    banned boolean DEFAULT FALSE,
-    country varchar(10),
-    created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    members_id int[],
-);
 
 ALTER TABLE Teams 
 ADD FOREIGN KEY (captain_id) REFERENCES Users(id) ON DELETE SET NULL;
@@ -64,4 +65,34 @@ CREATE TABLE Flags (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (chall_id) REFERENCES Challenges(id) ON DELETE CASCADE,
     UNIQUE (content, chall_id)
+);
+
+
+CREATE TABLE Submissions (
+    id SERIAL PRIMARY KEY,
+    submitted varchar(255) NOT NULL,
+    chall_id INT NOT NULL,
+    user_id int NOT NULL,
+    team_id int NOT NULL,
+    ip varchar(255), 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (chall_id) REFERENCES Challenges(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
+    FOREIGN KEY (team_id) REFERENCES Teams(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Solves (
+  id SERIAL PRIMARY KEY,
+  chall_id INT DEFAULT NULL,
+  user_id INT DEFAULT NULL,
+  team_id INT DEFAULT NULL,
+  
+  UNIQUE (chall_id, team_id),
+  UNIQUE (chall_id, user_id),
+  
+  FOREIGN KEY (chall_id) REFERENCES Challenges(id) ON DELETE CASCADE,
+  FOREIGN KEY (id) REFERENCES Submissions(id) ON DELETE CASCADE,
+  FOREIGN KEY (team_id) REFERENCES Teams(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
 );

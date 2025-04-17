@@ -14,35 +14,35 @@ func SendGeneralResp(c *fiber.Ctx, statusCode int, message string) error {
 
 func SendSinglePublicChallResp(c *fiber.Ctx, statusCode int, message string, challenge models.PublicChallenge) error {
 	response := models.SinglePublicChallResp{
-		Status:    statusCode,
-		Message:   message,
-		Data: challenge,
+		Status:  statusCode,
+		Message: message,
+		Data:    challenge,
 	}
 	return c.Status(statusCode).JSON(response)
 }
 func SendSingleAdminChallResp(c *fiber.Ctx, statusCode int, message string, challenge models.AdminChallenge) error {
 	response := models.SingleAdminChallResp{
-		Status:    statusCode,
-		Message:   message,
-		Data: challenge,
+		Status:  statusCode,
+		Message: message,
+		Data:    challenge,
 	}
 	return c.Status(statusCode).JSON(response)
 }
 
 func SendMultiplePublicChallsResp(c *fiber.Ctx, statusCode int, message string, challenges []models.PublicChallenge) error {
 	response := models.PublicChallengesResp{
-		Status:     statusCode,
-		Message:    message,
-		Data: challenges,
+		Status:  statusCode,
+		Message: message,
+		Data:    challenges,
 	}
 	return c.Status(statusCode).JSON(response)
 }
 
 func SendMultipleAdminChallsResp(c *fiber.Ctx, statusCode int, message string, challenges []models.AdminChallenge) error {
 	response := models.AdminChallengesResp{
-		Status:     statusCode,
-		Message:    message,
-		Data: challenges,
+		Status:  statusCode,
+		Message: message,
+		Data:    challenges,
 	}
 	return c.Status(statusCode).JSON(response)
 }
@@ -71,6 +71,15 @@ func SendMultipleFlagResp(c *fiber.Ctx, statusCode int, message string, flags []
 		Status:  statusCode,
 		Message: message,
 		Data:    flags,
+	}
+	return c.Status(statusCode).JSON(response)
+}
+
+func SendSingleSubmissionResp(c *fiber.Ctx, statusCode int, message string, submission models.Submission) error {
+	response := models.SingleSubmissionResp{
+		Status:  statusCode,
+		Message: message,
+		Data:    submission,
 	}
 	return c.Status(statusCode).JSON(response)
 }

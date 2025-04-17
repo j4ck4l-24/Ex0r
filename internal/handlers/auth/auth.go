@@ -22,14 +22,14 @@ func LoginAttempt(c *fiber.Ctx) error {
 	}
 	dbConn := db.DB
 
-	query := "SELECT id, username, email, role, password_hash FROM Users WHERE username = $1"
-	err := dbConn.QueryRow(query, reqBody.Username).Scan(&user.UserId, &user.DbUserName, &user.UserEmail, &user.UserRole, &user.StoredHashPassword)
+	query := "SELECT id, username, email, role, COALESCE(team_id, 0), password_hash FROM Users WHERE username = $1"
+	err := dbConn.QueryRow(query, reqBody.Username).Scan(&user.UserId, &user.DbUserName, &user.UserEmail, &user.UserRole, &user.TeamId, &user.StoredHashPassword)
 
 	if err != nil || !utils.VerifyPassword(reqBody.Password, user.StoredHashPassword) {
 		return utils.SendGeneralResp(c, fiber.StatusUnauthorized, "Incorrect credentials")
 	}
 
-	token, err := utils.CreateToken(user.UserId, user.DbUserName, user.UserEmail, user.UserRole)
+	token, err := utils.CreateToken(user.UserId, user.DbUserName, user.UserEmail, user.UserRole, user.TeamId)
 
 	if err != nil {
 		return utils.SendGeneralResp(c, fiber.StatusBadRequest, "Something Went Wrong")

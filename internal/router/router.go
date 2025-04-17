@@ -6,6 +6,7 @@ import (
 	"github.com/j4ck4l-24/Ex0r/internal/handlers/auth"
 	"github.com/j4ck4l-24/Ex0r/internal/handlers/challenges"
 	"github.com/j4ck4l-24/Ex0r/internal/handlers/flags"
+	"github.com/j4ck4l-24/Ex0r/internal/handlers/submissions"
 	"github.com/j4ck4l-24/Ex0r/internal/middleware"
 )
 
@@ -33,6 +34,8 @@ func ApiRoutes(app *fiber.App) {
 	api.Post("/flags", middleware.Protected(), middleware.AdminOnly(), flags.CreateFlag)
 	api.Patch("/flags/:id", middleware.Protected(), middleware.AdminOnly(), flags.UpdateFlag)
 	api.Delete("/flags/:id", middleware.Protected(), middleware.AdminOnly(), flags.DeleteFlag)
+
+	api.Post("/submit", middleware.Protected(), submissions.HitSubmission)
 }
 
 func healthcheck(c *fiber.Ctx) error {

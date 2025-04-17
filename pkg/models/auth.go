@@ -27,5 +27,6 @@ type User struct {
 	StoredHashPassword string `json:"hashed_password"`
 	UserEmail          string `json:"email"`
 	UserRole           string `json:"role"`
+	TeamId             int    `json:"team_id"`
 	DbUserName         string `json:"username"`
 }

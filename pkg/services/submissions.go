@@ -5,14 +5,14 @@ import (
 	"github.com/j4ck4l-24/Ex0r/pkg/models"
 )
 
-func CheckSolved(submission *models.Submission) bool {
-	dbConn := db.DB
-	query := "SELECT 1 FROM solves WHERE user_id = $1 AND team_id = $2"
+	func CheckSolved(submission *models.Submission) bool {
+		dbConn := db.DB
+		query := "SELECT 1 FROM solves WHERE user_id = $1 AND team_id = $2 AND chall_id = $3"
 
-	var exists int
-	err := dbConn.QueryRow(query, submission.ChallId, submission.TeamId).Scan(&exists)
-	return err == nil
-}
+		var exists int
+		err := dbConn.QueryRow(query, submission.UserId, submission.TeamId, submission.ChallId).Scan(&exists)
+		return err == nil
+	}
 
 func CheckForCorrectSubmission(submission *models.Submission) bool {
 	var actualFlag string
@@ -38,7 +38,11 @@ func CheckForCorrectSubmission(submission *models.Submission) bool {
 }
 
 func UpdateSolves(submission *models.Submission) error {
-	query := "INSERT INTO Solves (chall_id, user_id, team_id) VALUES($1, $2, $3) RETURNING id"
-	_, err := db.DB.Query(query, submission.ChallId, submission.UserId, submission.TeamId)
+	query := `
+		INSERT INTO Solves (submission_id, chall_id, user_id, team_id)
+		VALUES ($1, $2, $3, $4)
+		ON CONFLICT (chall_id, team_id) DO NOTHING
+	`
+	_, err := db.DB.Exec(query, submission.SubmissionId, submission.ChallId, submission.UserId, submission.TeamId)
 	return err
 }

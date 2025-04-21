@@ -26,16 +26,20 @@ func ApiRoutes(app *fiber.App) {
 	api.Get("/challenges", middleware.Protected(), challenges.GetAllChallenges)
 	api.Get("/challenges/:id", middleware.Protected(), challenges.GetChallenge)
 	api.Post("/challenges", middleware.Protected(), middleware.AdminOnly(), challenges.CreateChallenge)
-	api.Patch("/challenges/:id", middleware.Protected(), middleware.AdminOnly(), challenges.UpdateChallenge)
+	api.Patch("/challenges/", middleware.Protected(), middleware.AdminOnly(), challenges.UpdateChallenge)
 	api.Delete("/challenges/:id", middleware.Protected(), middleware.AdminOnly(), challenges.DeleteChallenge)
 
 	api.Get("/flags", middleware.Protected(), middleware.AdminOnly(), flags.GetAllFlag)
 	api.Get("/flags/:id", middleware.Protected(), middleware.AdminOnly(), flags.GetFlag)
 	api.Post("/flags", middleware.Protected(), middleware.AdminOnly(), flags.CreateFlag)
-	api.Patch("/flags/:id", middleware.Protected(), middleware.AdminOnly(), flags.UpdateFlag)
+	api.Patch("/flags/", middleware.Protected(), middleware.AdminOnly(), flags.UpdateFlag)
 	api.Delete("/flags/:id", middleware.Protected(), middleware.AdminOnly(), flags.DeleteFlag)
 
 	api.Post("/submit", middleware.Protected(), submissions.HitSubmission)
+	api.Get("/submissions", middleware.Protected(), middleware.AdminOnly(), submissions.GetAllSubmissions)
+	api.Get("/submissions/:id", middleware.Protected(), middleware.AdminOnly(), submissions.GetSubmission)
+	api.Patch("/submissions/", middleware.Protected(), middleware.AdminOnly(), submissions.UpdateSubmission)
+	api.Delete("/submissions/:id", middleware.Protected(), middleware.AdminOnly(), submissions.DeleteSubmission)
 }
 
 func healthcheck(c *fiber.Ctx) error {

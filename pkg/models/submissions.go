@@ -8,11 +8,12 @@ type Submission struct {
 	ChallId      int       `json:"chall_id"`
 	UserId       int       `json:"user_id"`
 	TeamId       int       `json:"team_id"`
+	Ip           string    `json:"ip"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 type SubmissionBody struct {
-	ChallId  int    `json:"chall_id"`
+	ChallId   int    `json:"chall_id"`
 	Submitted string `json:"submitted"`
 }
 
@@ -26,4 +27,10 @@ type MultipleSubmissionResp struct {
 	Status  int          `json:"status"`
 	Message string       `json:"message"`
 	Data    []Submission `json:"data"`
+}
+
+type SubmissionStatusResp struct {
+	Status    int    `json:"status"`
+	Message   string `json:"message"`
+	IsCorrect bool   `json:"isCorrect"`
 }

@@ -84,6 +84,7 @@ CREATE TABLE Submissions (
 
 CREATE TABLE Solves (
   id SERIAL PRIMARY KEY,
+  submission_id INT NOT NULL,
   chall_id INT DEFAULT NULL,
   user_id INT DEFAULT NULL,
   team_id INT DEFAULT NULL,
@@ -94,5 +95,6 @@ CREATE TABLE Solves (
   FOREIGN KEY (chall_id) REFERENCES Challenges(id) ON DELETE CASCADE,
   FOREIGN KEY (id) REFERENCES Submissions(id) ON DELETE CASCADE,
   FOREIGN KEY (team_id) REFERENCES Teams(id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
+  FOREIGN KEY (submission_id) REFERENCES Submissions(id) ON DELETE CASCADE
 );

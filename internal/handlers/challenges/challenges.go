@@ -86,7 +86,6 @@ func CreateChallenge(c *fiber.Ctx) error {
 func UpdateChallenge(c *fiber.Ctx) error {
 	dbConn := db.DB
 	challenge := new(models.AdminChallenge)
-	challenge.ChallId, _ = c.ParamsInt("id")
 	if err := c.BodyParser(challenge); err != nil {
 		return utils.SendGeneralResp(c, fiber.StatusBadRequest, "Invalid request body")
 	}

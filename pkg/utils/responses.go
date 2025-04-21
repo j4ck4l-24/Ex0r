@@ -83,3 +83,21 @@ func SendSingleSubmissionResp(c *fiber.Ctx, statusCode int, message string, subm
 	}
 	return c.Status(statusCode).JSON(response)
 }
+
+func SendMultipleSubmissionResp(c *fiber.Ctx, statusCode int, message string, submissions []models.Submission) error {
+	response := models.MultipleSubmissionResp{
+		Status:  statusCode,
+		Message: message,
+		Data:    submissions,
+	}
+	return c.Status(statusCode).JSON(response)
+}
+
+func SendSubmissionStatusResp(c *fiber.Ctx, statusCode int, message string, isCorrect bool) error {
+	response := models.SubmissionStatusResp{
+		Status:    statusCode,
+		Message:   message,
+		IsCorrect: isCorrect,
+	}
+	return c.Status(statusCode).JSON(response)
+}

@@ -13,8 +13,8 @@ import (
 
 func main() {
 	app := fiber.New()
-	router.ApiRoutes(app)
 	app.Use(cors.New())
+	router.ApiRoutes(app)
 
 	if err := db.InitDB(); err != nil {
 		log.Fatalf("DB init failed: %v", err)

@@ -144,6 +144,11 @@ func UpdateSubmission(c *fiber.Ctx) error {
 		return utils.SendGeneralResp(c, fiber.StatusBadRequest, "Invalid request body")
 	}
 
+	submission.SubmissionId, err = c.ParamsInt("id")
+	if err != nil {
+		return utils.SendGeneralResp(c, fiber.StatusNotFound, "Invalid submission_id")
+	}
+
 	query := "UPDATE Submissions SET submitted = $1, chall_id = $2, user_id = $3, team_id = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 RETURNING id;"
 	err = dbConn.QueryRow(query, submission.Submitted, submission.ChallId, submission.UserId, submission.TeamId, submission.SubmissionId).Scan(&submission.SubmissionId)
 	if err != nil {

@@ -98,6 +98,11 @@ func UpdateFlag(c *fiber.Ctx) error {
 		return utils.SendGeneralResp(c, fiber.StatusBadRequest, "Invalid request body")
 	}
 
+	flag.FlagId, err = c.ParamsInt("id")
+	if err != nil {
+		return utils.SendGeneralResp(c, fiber.StatusNotFound, "Invalid chall_id")
+	}
+
 	query := "UPDATE Flags SET content = $1, type = $2, chall_id = $3, updated_at = CURRENT_TIMESTAMP WHERE id = $4 RETURNING id;"
 	err = dbConn.QueryRow(query, flag.Content, flag.Type, flag.ChallId, flag.FlagId).Scan(&flag.FlagId)
 	if err != nil {

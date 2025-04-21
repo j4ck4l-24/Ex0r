@@ -86,8 +86,14 @@ func CreateChallenge(c *fiber.Ctx) error {
 func UpdateChallenge(c *fiber.Ctx) error {
 	dbConn := db.DB
 	challenge := new(models.AdminChallenge)
+
 	if err := c.BodyParser(challenge); err != nil {
 		return utils.SendGeneralResp(c, fiber.StatusBadRequest, "Invalid request body")
+	}
+	var err error;
+	challenge.ChallId, err = c.ParamsInt("id")
+	if err != nil {
+		return utils.SendGeneralResp(c, fiber.StatusNotFound, "Invalid chall_id")
 	}
 	if challenge.Type == "static" {
 		challenge, err := services.UpdateStaticChallenge(dbConn, challenge)
